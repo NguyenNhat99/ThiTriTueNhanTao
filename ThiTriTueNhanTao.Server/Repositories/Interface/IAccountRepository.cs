@@ -11,6 +11,7 @@ namespace ThiTriTueNhanTao.Server.Repositories.Interface
         public Task<bool> UpdatePasswordAsync(ChangePasswordModel model);
         public Task<bool> UpdateInformationAsync(UpdateInformationModel model);
         public Task<List<AccountModel>> GetAccounts();
+        public Task<List<AccountModel>> DetailAccount(int id);
 
     }
 }

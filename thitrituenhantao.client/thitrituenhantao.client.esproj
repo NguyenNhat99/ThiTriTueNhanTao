@@ -12,7 +12,6 @@
     <Folder Include="src\components\auth\" />
     <Folder Include="src\components\loading\" />
     <Folder Include="src\Context\" />
-    <Folder Include="src\pages\admin\profile\" />
     <Folder Include="src\pages\auth\signin\components\" />
     <Folder Include="src\pages\user\" />
     <Folder Include="src\service\" />

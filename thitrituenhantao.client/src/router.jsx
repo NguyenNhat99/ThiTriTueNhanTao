@@ -45,6 +45,7 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
+        layout: AdminLayout
     }
     //,
     //{

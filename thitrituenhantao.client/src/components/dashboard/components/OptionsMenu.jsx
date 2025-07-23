@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Divider, { dividerClasses } from '@mui/material/Divider';
 import Menu from '@mui/material/Menu';
@@ -10,7 +10,8 @@ import ListItemIcon, { listItemIconClasses } from '@mui/material/ListItemIcon';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import MenuButton from './MenuButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import authService from '../../../service/authService';
 
 const MenuItem = styled(MuiMenuItem)({
     margin: '2px 0',
@@ -19,12 +20,26 @@ const MenuItem = styled(MuiMenuItem)({
 export default function OptionsMenu() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
+    const navigate = useNavigate();
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleLogout = async () => {
+        handleClose();
+
+        // Gọi service xử lý đăng xuất (ví dụ: xóa token trong localStorage)
+        await authService.logout();
+
+        // Điều hướng về trang đăng nhập
+        navigate("/dang-nhap");
+    };
+
     return (
         <React.Fragment>
             <MenuButton
@@ -57,7 +72,7 @@ export default function OptionsMenu() {
                 <MenuItem component={Link} to="/admin/thong-tin-ca-nhan">Profile</MenuItem>
                 <Divider />
                 <MenuItem
-                    onClick={handleClose}
+                    onClick={handleLogout}
                     sx={{
                         [`& .${listItemIconClasses.root}`]: {
                             ml: 'auto',

@@ -27,12 +27,12 @@ const getCurrentUser = async () => {
         return null;
     }
 };
-const updatePassword = async (currentPassword, newPassword) => {
+const updatePassword = async (MatKhau, MatKhauMoi) => {
     try {
         const res = await api.post(`/accounts/auth/changePassword`, {
-            currentPassword, newPassword
+            MatKhau, MatKhauMoi
         });
-        return true;
+        return res.status === 200;
     } catch (error) {
         return false;
     }

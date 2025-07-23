@@ -37,6 +37,11 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             _ImageHelper = ImageHelper;
         }
 
+        public Task<List<AccountModel>> DetailAccount(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<AccountModel>> GetAccounts()
         {
             var currentUser = await GetCurrentUser(); 
@@ -131,11 +136,11 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             var result = await userManager.CreateAsync(user, model.MatKhau);
             if (!result.Succeeded) return result;
 
-            if (!await roleManager.RoleExistsAsync(UserRole.Admin))
+            if (!await roleManager.RoleExistsAsync(UserRole.NhanVien))
             {
-                await roleManager.CreateAsync(new IdentityRole(UserRole.Admin));
+                await roleManager.CreateAsync(new IdentityRole(UserRole.NhanVien));
             }
-            await userManager.AddToRoleAsync(user, UserRole.Admin);
+            await userManager.AddToRoleAsync(user, UserRole.NhanVien);
 
             #region XuLyHinh
             if (model.images != null && model.images.Count > 0)

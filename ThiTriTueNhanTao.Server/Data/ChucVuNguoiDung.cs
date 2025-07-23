@@ -10,10 +10,6 @@ namespace ThiTriTueNhanTao.Server.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string UserId { get; set; } = string.Empty;
-        public int MaChucVu { get; set; }
-        public int? MaPhongBan { get; set; }
-        public int? MaChiNhanh { get; set; }
-        public int? MaNhom { get; set; }
         public int LuongCoBan { set; get; }
         public DateTime NgayBatDau { get; set; } = DateTime.Now;
         public User? User { get; set; }

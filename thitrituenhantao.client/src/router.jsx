@@ -9,6 +9,8 @@ const Dashboard = lazy(() => import("./pages/admin/dashboard/Dashboard"));
 const Profile = lazy(() => import("./pages/admin/profile/profile"));
 const AddEmployee = lazy(() => import("./pages/admin/employee/AddEmployee"));
 const ListEmployee = lazy(() => import("./pages/admin/employee/ListEmployee"));
+const DetailAccount = lazy(() => import("./pages/admin/employee/DetailAccount"));
+
 const HomePage = lazy(() => import("./pages/user/homepage"));
 
 const AdminLayout = lazy(() => import("./layouts/adminlayout"));
@@ -45,6 +47,12 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
+        layout: AdminLayout
+    }
+    ,
+    {
+        path: ROUTERS.ADMIN.DETAILACCOUNT,
+        component: <DetailAccount />,
         layout: AdminLayout
     }
     //,

@@ -12,6 +12,7 @@ export const ROUTERS = {
         DASHBOARD: "admin/dashboard",
         PROFILE: "admin/thong-tin-ca-nhan",
         ADDEMPLOYEE: "admin/them-nhan-vien",
-        EMPLOYEE: "admin/quan-ly-nhan-vien"
+        EMPLOYEE: "admin/quan-ly-nhan-vien",
+        DETAILACCOUNT: "admin/quan-ly-nhan-vien/chi-tiet-nhan-vien/:email"
     },
 };

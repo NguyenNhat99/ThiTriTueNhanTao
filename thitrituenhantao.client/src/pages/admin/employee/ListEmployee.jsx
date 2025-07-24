@@ -12,16 +12,35 @@ import {
     DataGrid,
     GridToolbar,
 } from '@mui/x-data-grid';
+import { Add, Visibility, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../../service/authService';
 
-function renderStatus(status) {
-    const colors = {
-        'Đang làm': 'success',
-        'Nghỉ việc': 'default',
+const renderStatus = (status) => {
+    const colorMap = {
+        'Đang hoạt động': 'success',
+        'Tạm nghỉ': 'warning',
+        'Nghỉ việc': 'error',
     };
-    return <Chip label={status} color={colors[status]} size="small" />;
-}
+
+    const chipColor = colorMap[status] || 'default';
+
+    // Optional: icon status
+    // const iconMap = {
+    //     'Đang hoạt động': <CheckCircle fontSize="small" />,
+    //     'Tạm nghỉ': <PauseCircle fontSize="small" />,
+    //     'Nghỉ việc': <Cancel fontSize="small" />,
+    // };
+
+    return (
+        <Chip
+            label={status}
+            color={chipColor}
+            size="small"
+            variant="outlined"
+        />
+    );
+};
 
 export default function EmployeeManagementPage() {
     const navigate = useNavigate();
@@ -32,7 +51,7 @@ export default function EmployeeManagementPage() {
     };
 
     const handleDetail = (row) => {
-        navigate(`/admin/chi-tiet-nhan-vien/${row.email}`);
+        navigate(`/admin/quan-ly-nhan-vien/chi-tiet-nhan-vien/${row.email}`);
     };
 
     const handleDelete = async (row) => {
@@ -52,9 +71,9 @@ export default function EmployeeManagementPage() {
         {
             field: 'avatar',
             headerName: '',
-            width: 50,
+            width: 60,
             renderCell: (params) => (
-                <Avatar sx={{ width: 32, height: 32 }}>
+                <Avatar sx={{ width: 36, height: 36, bgcolor: '#90caf9' }}>
                     {params.row.fullName?.charAt(0).toUpperCase()}
                 </Avatar>
             ),
@@ -69,7 +88,7 @@ export default function EmployeeManagementPage() {
             field: 'status',
             headerName: 'Trạng thái',
             flex: 0.8,
-            minWidth: 100,
+            minWidth: 120,
             renderCell: (params) => renderStatus(params.value),
         },
         { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 1, minWidth: 120 },
@@ -83,17 +102,19 @@ export default function EmployeeManagementPage() {
             renderCell: (params) => (
                 <Stack direction="row" spacing={1}>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="primary"
                         size="small"
+                        startIcon={<Visibility />}
                         onClick={() => handleDetail(params.row)}
                     >
                         Chi tiết
                     </Button>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         color="error"
                         size="small"
+                        startIcon={<Delete />}
                         onClick={() => handleDelete(params.row)}
                     >
                         Xóa
@@ -112,7 +133,7 @@ export default function EmployeeManagementPage() {
                     fullName: acc.hoTen,
                     email: acc.email,
                     phone: acc.soDt,
-                    position: acc.role,
+                    position: acc.role === "QuanLy" ? "Quản lý" : acc.role === "admin" ? "Quản trị" : "Nhân viên",
                     status: acc.trangThai,
                     startDate: new Date(acc.ngayBatDauLam).toLocaleDateString('vi-VN'),
                 }));
@@ -126,19 +147,25 @@ export default function EmployeeManagementPage() {
     }, []);
 
     return (
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ width: '100%', maxWidth: '1300px', overflowX: 'auto' }}>
-                <Typography variant="h4" gutterBottom>
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', p: 2 }}>
+            <Box sx={{ width: '100%', maxWidth: '1280px' }}>
+                <Typography variant="h4" gutterBottom fontWeight="bold">
                     Quản lý nhân viên
                 </Typography>
 
                 <Stack direction="row" justifyContent="flex-end" mb={2}>
-                    <Button variant="contained" color="primary" onClick={handleAddEmployee}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={handleAddEmployee}
+                        sx={{ borderRadius: 2 }}
+                    >
                         Thêm nhân viên
                     </Button>
                 </Stack>
 
-                <Paper elevation={3} sx={{ p: 2 }}>
+                <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
                     <DataGrid
                         autoHeight
                         rows={employees}
@@ -156,6 +183,7 @@ export default function EmployeeManagementPage() {
                             '& .MuiDataGrid-toolbarContainer': {
                                 justifyContent: 'flex-end',
                             },
+                            borderRadius: 2,
                         }}
                     />
                 </Paper>

@@ -13,6 +13,18 @@ const login = async (email, password) => {
         throw new Error("Lỗi");
     }
 };
+const signUp = async (formData) => {
+    try {
+        const res = await api.post('/accounts/auth/singup', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || 'Đăng ký thất bại';
+    }
+};
 const getCurrentUser = async () => {
     try {
         const token = getToken();
@@ -39,10 +51,11 @@ const updatePassword = async (MatKhau, MatKhauMoi) => {
 }
 const updateInformation = async (updateData) => {
     try {
-        const res = await api.post('/accounts/auth/changeInformation', updateData);
-        return res.data;
-    } catch (error) {
-        throw error.response?.data || error.message || 'Lỗi không xác định';
+        const res = await api.post("/accounts/auth/changeinformation", updateData);
+        return res.status === 200;
+    } catch (err) {
+        console.error("Cập nhật thông tin thất bại:", err);
+        return false;
     }
 }
 const logout = () => {
@@ -68,13 +81,27 @@ const getAccounts = async () => {
         throw error.response?.data || error.message || 'Lỗi không xác định';
     }
 };
+const getAccountDetail = async (email) => {
+    try {
+        const token = getToken();
+        if (!token) throw new Error("Chưa đăng nhập");
+
+        const res = await api.get(`/accounts/auth/detail/${email}`);
+
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || "Không thể lấy thông tin tài khoản";
+    }
+};
 
 export default {
     login,
+    signUp,
     logout,
     getToken,
     getCurrentUser,
     updatePassword,
     updateInformation,
-    getAccounts
+    getAccounts,
+    getAccountDetail
 };

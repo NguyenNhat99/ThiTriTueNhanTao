@@ -102,7 +102,6 @@ namespace ThiTriTueNhanTao.Server.Controllers
         /// http 500: xảy ra lỗi server hoặc không xác định
         /// </returns>
         [HttpPost("auth/changepassword")]
-        [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             try
@@ -165,6 +164,32 @@ namespace ThiTriTueNhanTao.Server.Controllers
                 return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
             }
         }
+        /// <summary>
+        /// API lấy chi tiết tài khoản theo email
+        /// </summary>
+        /// <param name="email">Địa chỉ email của người dùng cần lấy thông tin</param>
+        /// <returns>
+        /// Http 404 NotFound: nếu không tìm thấy người dùng
+        /// Http 200 Ok: trả về thông tin tài khoản
+        /// Http 500: lỗi server
+        /// </returns>
+        [HttpGet("auth/detail/{email}")]
+        public async Task<IActionResult> GetAccountDetail(string email)
+        {
+            try
+            {
+                var account = await _accountRepository.DetailAccount(email);
+                if (account == null)
+                    return NotFound(new { message = "Không tìm thấy tài khoản" });
+
+                return Ok(account);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau!" });
+            }
+        }
+
 
     }
 }

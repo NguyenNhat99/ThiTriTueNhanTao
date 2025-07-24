@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,9 +38,22 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             _ImageHelper = ImageHelper;
         }
 
-        public Task<List<AccountModel>> DetailAccount(int id)
+        public async Task<AccountModel> DetailAccount(string email)
         {
-            throw new NotImplementedException();
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return null;
+
+            var accountModel = mapper.Map<AccountModel>(user);
+            accountModel.Role = (await userManager.GetRolesAsync(user)).FirstOrDefault() ?? "";
+
+            var images = await _context.hinhAnhNhanViens
+                .Where(img => img.UserId == user.Id)
+                .Select(img => img.ImageUrl)
+                .ToListAsync();
+
+            accountModel.Images = images; 
+
+            return accountModel;
         }
 
         public async Task<List<AccountModel>> GetAccounts()
@@ -125,12 +139,12 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
                 Huyen = model.Huyen,
                 Tinh = model.Tinh,
                 CCCD = model.CCCD,
-                NgayCap = model.NgayCap,
+                NgayCap = DateTime.SpecifyKind(model.NgayCap, DateTimeKind.Utc),
                 NoiCap = model.NoiCap,
                 HeSoLuong = model.HeSoLuong,
                 TrangThai = model.TrangThai,
                 TrinhDo = model.TrinhDo,
-                NgayBatDauLam = model.NgayBatDauLam
+                NgayBatDauLam = DateTime.SpecifyKind(model.NgayBatDauLam, DateTimeKind.Utc)
             };
 
             var result = await userManager.CreateAsync(user, model.MatKhau);
@@ -174,7 +188,7 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             user.CCCD = model.CCCD;
             user.PhoneNumber = model.SoDt;
             user.GioiTinh = model.GioiTinh;
-            user.NgayCap = model.NgayCap;
+            user.NgayCap = DateTime.SpecifyKind(model.NgayCap, DateTimeKind.Utc);
             user.NoiCap = model.NoiCap;
             user.SoNha = model.SoNha;
             user.Xa = model.Xa;
@@ -183,31 +197,7 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             user.HeSoLuong = model.HeSoLuong;
             user.TrangThai = model.TrangThai;
             user.TrinhDo = model.TrinhDo;
-            user.NgayBatDauLam = model.NgayBatDauLam;
-
-            #region XuLyHinh
-            if (model.images != null && model.images.Count > 0)
-            {
-                var deleteImages = _context.hinhAnhNhanViens.Where(d=>d.UserId==user.Id).ToList();
-                foreach (var image in deleteImages)
-                {
-                    await _ImageHelper.DeleteAsync(image.ImageUrl, "employeeimg", user.Id);
-                }
-                foreach (var file in model.images)
-                {
-                    if (file.Length > 0)
-                    {
-                        string url = await _ImageHelper.AddAsync(file, "employeeimg");
-                        HinhAnhNhanVien img = new HinhAnhNhanVien()
-                        {
-                            ImageUrl = url,
-                            UserId = user.Id
-                        };
-                        _context.hinhAnhNhanViens.Add(img);
-                    }
-                }
-            }
-            #endregion
+            user.NgayBatDauLam = DateTime.SpecifyKind(model.NgayBatDauLam, DateTimeKind.Utc);
 
             await _context.SaveChangesAsync(); 
             var result = await userManager.UpdateAsync(user);

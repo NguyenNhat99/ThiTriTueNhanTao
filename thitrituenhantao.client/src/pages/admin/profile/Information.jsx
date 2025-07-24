@@ -65,6 +65,7 @@ const InformationPage = ({ user, onSnackbar }) => {
 
     const handleUpdate = async () => {
         setLoading(true);
+        console.log(infoData)
         const result = await authService.updateInformation(infoData);
         if (result) {
             onSnackbar({ open: true, status: "success", content: "Cập nhật thông tin thành công" });

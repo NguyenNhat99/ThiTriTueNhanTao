@@ -15,6 +15,12 @@ const HomePage = lazy(() => import("./pages/user/homepage"));
 
 const AdminLayout = lazy(() => import("./layouts/adminlayout"));
 
+const CompanyStructure = lazy(() => import("./pages/admin/structure/CompanyStructure"));
+
+const ManageBranches = lazy(() => import("./pages/admin/branches/ManageBranches"));
+
+const ManageDepartments = lazy(() => import("./pages/admin/departments/ManageDepartments"));
+
 const ROUTES_CONFIG = [
     {
         path: ROUTERS.USER.HOME,
@@ -48,11 +54,25 @@ const ROUTES_CONFIG = [
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
         layout: AdminLayout
-    }
-    ,
+    },
     {
         path: ROUTERS.ADMIN.DETAILACCOUNT,
         component: <DetailAccount />,
+        layout: AdminLayout
+    },
+    {
+        path: ROUTERS.ADMIN.STRUCTURE,
+        component: <CompanyStructure />,
+        layout: AdminLayout
+    },
+    {
+        path: ROUTERS.ADMIN.BRANCHES,
+        component: <ManageBranches />,
+        layout: AdminLayout
+    },
+    {
+        path: ROUTERS.ADMIN.DEPARTMENTS,
+        component: <ManageDepartments />,
         layout: AdminLayout
     }
     //,

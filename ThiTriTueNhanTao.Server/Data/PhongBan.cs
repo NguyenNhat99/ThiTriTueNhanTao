@@ -14,6 +14,7 @@ namespace ThiTriTueNhanTao.Server.Data
         public string TenPhongBan { set; get; } = string.Empty;
         public string MoTa { set; get; } = string.Empty;
         public DateTime NgayTao { set; get; }
+        public int ChiNhanhId { get; set; }
         public  ChiNhanh? ChiNhanh { set; get; }
         public ICollection<Nhom> Nhoms { set; get; } = new List<Nhom>();
         public ICollection<ChucVuNguoiDung> ChucVuNguoiDungs { get; set; } = new List<ChucVuNguoiDung>();

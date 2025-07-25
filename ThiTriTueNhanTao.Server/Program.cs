@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using ThiTriTueNhanTao.Server.Data;
 using ThiTriTueNhanTao.Server.Repositories;
+using ThiTriTueNhanTao.Server.Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,9 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
+
+builder.Services.AddScoped<CompanyStructureRepository>();
+
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
 app.UseDefaultFiles();

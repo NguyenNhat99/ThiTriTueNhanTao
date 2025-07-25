@@ -13,6 +13,7 @@ namespace ThiTriTueNhanTao.Server.Data
         [Required]
         public string TenNhom { set; get; } = string.Empty;
         public string MoTaNhiemVu { set; get; } = string.Empty;
+        public int PhongBanId { get; set; }
         public  PhongBan? PhongBan { get; set; }
         public  ICollection<ChucVuNguoiDung> ChucVuNguoiDungs { get; set; } = new List<ChucVuNguoiDung>();
 

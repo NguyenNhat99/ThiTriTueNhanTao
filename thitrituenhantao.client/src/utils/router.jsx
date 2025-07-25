@@ -13,6 +13,9 @@ export const ROUTERS = {
         PROFILE: "admin/thong-tin-ca-nhan",
         ADDEMPLOYEE: "admin/them-nhan-vien",
         EMPLOYEE: "admin/quan-ly-nhan-vien",
-        DETAILACCOUNT: "admin/quan-ly-nhan-vien/chi-tiet-nhan-vien/:email"
+        DETAILACCOUNT: "admin/quan-ly-nhan-vien/chi-tiet-nhan-vien/:email",
+        STRUCTURE: "admin/cau-truc-cong-ty",
+        BRANCHES: "admin/quan-ly-chi-nhanh",
+        DEPARTMENTS: "admin/quan-ly-phong-ban",
     },
 };

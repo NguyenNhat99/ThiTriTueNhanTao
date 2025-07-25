@@ -19,5 +19,8 @@ namespace ThiTriTueNhanTao.Server.Data
         public DbSet<PhongBan> phongBans{ get; set; }
         public DbSet<User> users{ get; set; }
         #endregion
+        public DbSet<ChiNhanh> ChiNhanh { get; set; }
+        public DbSet<PhongBan> PhongBan { get; set; }
+        public DbSet<Nhom> Nhom { get; set; }
     }
 }

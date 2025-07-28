@@ -14,7 +14,7 @@ namespace ThiTriTueNhanTao.Server.Data
         public string TenNhom { set; get; } = string.Empty;
         public string MoTaNhiemVu { set; get; } = string.Empty;
         public int PhongBanId { get; set; }
-        public  PhongBan? PhongBan { get; set; }
+        public PhongBan PhongBan { get; set; } = null!;
         public  ICollection<ChucVuNguoiDung> ChucVuNguoiDungs { get; set; } = new List<ChucVuNguoiDung>();
 
     }

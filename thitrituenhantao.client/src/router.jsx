@@ -10,15 +10,14 @@ const Profile = lazy(() => import("./pages/admin/profile/profile"));
 const AddEmployee = lazy(() => import("./pages/admin/employee/AddEmployee"));
 const ListEmployee = lazy(() => import("./pages/admin/employee/ListEmployee"));
 const DetailAccount = lazy(() => import("./pages/admin/employee/DetailAccount"));
+const AccessDenied = lazy(() => import("./pages/auth/AccessDeniedPage/AccessDeniedPage"));
+
 
 const HomePage = lazy(() => import("./pages/user/homepage"));
 
 const AdminLayout = lazy(() => import("./layouts/adminlayout"));
-
 const CompanyStructure = lazy(() => import("./pages/admin/structure/CompanyStructure"));
-
 const ManageBranches = lazy(() => import("./pages/admin/branches/ManageBranches"));
-
 const ManageDepartments = lazy(() => import("./pages/admin/departments/ManageDepartments"));
 
 const ROUTES_CONFIG = [
@@ -33,47 +32,55 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.DASHBOARD,
         component: <Dashboard />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin", "NhanVien"],
     },
     {
         path: ROUTERS.ADMIN.ADDEMPLOYEE,
         component: <AddEmployee />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"],
     },
     {
         path: ROUTERS.ADMIN.EMPLOYEE,
         component: <ListEmployee />,
-        layout: AdminLayout
-    },
-    {
-        path: ROUTERS.ADMIN.DASHBOARD,
-        component: <Dashboard />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"]
     },
     {
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin", "NhanVien"]
     },
     {
         path: ROUTERS.ADMIN.DETAILACCOUNT,
         component: <DetailAccount />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"]
     },
     {
         path: ROUTERS.ADMIN.STRUCTURE,
         component: <CompanyStructure />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"]
     },
     {
         path: ROUTERS.ADMIN.BRANCHES,
         component: <ManageBranches />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"]
     },
     {
         path: ROUTERS.ADMIN.DEPARTMENTS,
         component: <ManageDepartments />,
-        layout: AdminLayout
+        layout: AdminLayout,
+        roles: ["Admin"]
+    }
+    ,
+    {
+        path: ROUTERS.AUTH.NOTAUTH,
+        component: <AccessDenied />
     }
     //,
     //{
@@ -107,9 +114,9 @@ const renderUserRouter = () => {
 
 const RouterCustom = () => {
     return (
-        <Suspense fallback={<Loading />}>
-            {renderUserRouter()}
-        </Suspense>
+        //<Suspense fallback={<Loading />}>
+        //</Suspense>
+        renderUserRouter() 
     );
 };
 export default RouterCustom;

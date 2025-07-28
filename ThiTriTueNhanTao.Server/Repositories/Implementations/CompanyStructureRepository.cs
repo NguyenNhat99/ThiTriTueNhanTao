@@ -15,7 +15,7 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
 
         public async Task<List<ChiNhanhDto>> GetCompanyStructureAsync()
         {
-            var data = await _context.ChiNhanh
+            var data = await _context.ChiNhanhs
                 .Select(cn => new ChiNhanhDto
                 {
                     Id = cn.Id,

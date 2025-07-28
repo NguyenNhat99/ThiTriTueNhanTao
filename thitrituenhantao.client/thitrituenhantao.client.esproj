@@ -13,6 +13,7 @@
     <Folder Include="src\components\loading\" />
     <Folder Include="src\Context\" />
     <Folder Include="src\pages\admin\NewFolder\" />
+    <Folder Include="src\pages\auth\AccessDeniedPage\" />
     <Folder Include="src\pages\auth\signin\components\" />
     <Folder Include="src\pages\user\" />
     <Folder Include="src\service\" />

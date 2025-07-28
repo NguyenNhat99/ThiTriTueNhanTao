@@ -102,6 +102,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
         /// http 500: xảy ra lỗi server hoặc không xác định
         /// </returns>
         [HttpPost("auth/changepassword")]
+        [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             try
@@ -143,6 +144,32 @@ namespace ThiTriTueNhanTao.Server.Controllers
             }
         }
         /// <summary>
+        /// API thay đổi thông tin tài khoản nhân viên
+        /// </summary>
+        /// <param name="model">Thông tin cần thay đổi</param>
+        /// <returns>
+        /// Http 404 NotFound: model null
+        /// Http 200 Ok: Đổi thông tin thành công
+        /// Http 400 BadRequest: nếu thay đổi thông tin thất bại
+        /// http 500: xảy ra lỗi server hoặc không xác định
+        /// </returns>
+        [HttpPost("auth/ChangeEmployeeInformation")]
+        [Authorize]
+        public async Task<IActionResult> ChangeEmployeeInformation([FromForm] UpdateInformationModel model)
+        {
+            try
+            {
+                if (model == null) return NotFound(new { message = "Không thấy thông tin cần đổi" });
+                var changeStatus = await _accountRepository.UpdateEmployeeAsync(model);
+                if (changeStatus) return Ok("Đổi thông tin thành công");
+                return BadRequest("Đổi thông tin thất bại");
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
+            }
+        }
+        /// <summary>
         /// API lấy danh sách tài khoản (trừ tài khoản đang đăng nhập)
         /// </summary>
         /// <returns>
@@ -151,7 +178,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
         /// Http 500: lỗi server
         /// </returns>
         [HttpGet("auth/accounts")]
-        [Authorize]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> GetAccounts()
         {
             try
@@ -174,6 +201,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
         /// Http 500: lỗi server
         /// </returns>
         [HttpGet("auth/detail/{email}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> GetAccountDetail(string email)
         {
             try

@@ -1,20 +1,15 @@
-﻿import * as React from 'react';
+﻿import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import {
-    Box,
-    Typography,
-    Paper,
-    Avatar,
-    Chip,
-    Button,
-    Stack,
+    Box, Typography, Paper, Chip, Button, Stack, CircularProgress,
+    TextField, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, MenuItem, Pagination
 } from '@mui/material';
-import {
-    DataGrid,
-    GridToolbar,
-} from '@mui/x-data-grid';
-import { Add, Visibility, Delete } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../../service/authService';
+
+const Visibility = React.lazy(() => import('@mui/icons-material/Visibility'));
+const Delete = React.lazy(() => import('@mui/icons-material/Delete'));
 
 const renderStatus = (status) => {
     const colorMap = {
@@ -22,20 +17,10 @@ const renderStatus = (status) => {
         'Tạm nghỉ': 'warning',
         'Nghỉ việc': 'error',
     };
-
-    const chipColor = colorMap[status] || 'default';
-
-    // Optional: icon status
-    // const iconMap = {
-    //     'Đang hoạt động': <CheckCircle fontSize="small" />,
-    //     'Tạm nghỉ': <PauseCircle fontSize="small" />,
-    //     'Nghỉ việc': <Cancel fontSize="small" />,
-    // };
-
     return (
         <Chip
             label={status}
-            color={chipColor}
+            color={colorMap[status] || 'default'}
             size="small"
             variant="outlined"
         />
@@ -44,87 +29,50 @@ const renderStatus = (status) => {
 
 export default function EmployeeManagementPage() {
     const navigate = useNavigate();
-    const [employees, setEmployees] = React.useState([]);
+    const [employees, setEmployees] = useState([]);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchText, setSearchText] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
 
-    const handleAddEmployee = () => {
+    const handleAddEmployee = useCallback(() => {
         navigate('/admin/them-nhan-vien');
-    };
+    }, [navigate]);
 
-    const handleDetail = (row) => {
+    const handleDetail = useCallback((row) => {
         navigate(`/admin/quan-ly-nhan-vien/chi-tiet-nhan-vien/${row.email}`);
-    };
+    }, [navigate]);
 
-    const handleDelete = async (row) => {
-        const confirm = window.confirm(`Bạn có chắc muốn xóa nhân viên "${row.fullName}" không?`);
-        if (!confirm) return;
-
+    const handleDelete = useCallback(async (row) => {
+        if (!window.confirm(`Bạn có chắc muốn xóa nhân viên "${row.fullName}" không?`)) return;
         try {
             await authService.deleteAccount(row.email);
-            setEmployees((prev) => prev.filter((emp) => emp.email !== row.email));
+            const updated = employees.filter((emp) => emp.email !== row.email);
+            setEmployees(updated);
+            applyFilter(updated, searchText, statusFilter);
         } catch (error) {
             console.error('Lỗi khi xóa nhân viên:', error);
             alert('Không thể xóa nhân viên.');
         }
+    }, [employees, searchText, statusFilter]);
+
+    const applyFilter = (list, text, status) => {
+        let result = [...list];
+        if (text) {
+            result = result.filter(emp =>
+                emp.fullName.toLowerCase().includes(text.toLowerCase())
+            );
+        }
+        if (status) {
+            result = result.filter(emp => emp.status === status);
+        }
+        setFilteredEmployees(result);
+        setPage(1);
     };
 
-    const columns = [
-        {
-            field: 'avatar',
-            headerName: '',
-            width: 60,
-            renderCell: (params) => (
-                <Avatar sx={{ width: 36, height: 36, bgcolor: '#90caf9' }}>
-                    {params.row.fullName?.charAt(0).toUpperCase()}
-                </Avatar>
-            ),
-            sortable: false,
-            filterable: false,
-        },
-        { field: 'fullName', headerName: 'Họ và tên', flex: 1.2, minWidth: 150 },
-        { field: 'email', headerName: 'Email', flex: 1.3, minWidth: 200 },
-        { field: 'phone', headerName: 'SĐT', flex: 0.8, minWidth: 120 },
-        { field: 'position', headerName: 'Chức vụ', flex: 1, minWidth: 130 },
-        {
-            field: 'status',
-            headerName: 'Trạng thái',
-            flex: 0.8,
-            minWidth: 120,
-            renderCell: (params) => renderStatus(params.value),
-        },
-        { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 1, minWidth: 120 },
-        {
-            field: 'actions',
-            headerName: 'Lệnh',
-            flex: 1,
-            minWidth: 160,
-            sortable: false,
-            filterable: false,
-            renderCell: (params) => (
-                <Stack direction="row" spacing={1}>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        startIcon={<Visibility />}
-                        onClick={() => handleDetail(params.row)}
-                    >
-                        Chi tiết
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        startIcon={<Delete />}
-                        onClick={() => handleDelete(params.row)}
-                    >
-                        Xóa
-                    </Button>
-                </Stack>
-            ),
-        },
-    ];
-
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchEmployees = async () => {
             try {
                 const data = await authService.getAccounts();
@@ -138,13 +86,30 @@ export default function EmployeeManagementPage() {
                     startDate: new Date(acc.ngayBatDauLam).toLocaleDateString('vi-VN'),
                 }));
                 setEmployees(mapped);
+                setFilteredEmployees(mapped);
             } catch (err) {
                 console.error('Lỗi lấy danh sách nhân viên:', err);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchEmployees();
     }, []);
+
+    const handleSearchChange = (e) => {
+        const text = e.target.value;
+        setSearchText(text);
+        applyFilter(employees, text, statusFilter);
+    };
+
+    const handleStatusChange = (e) => {
+        const status = e.target.value;
+        setStatusFilter(status);
+        applyFilter(employees, searchText, status);
+    };
+
+    const paginatedEmployees = filteredEmployees.slice((page - 1) * pageSize, page * pageSize);
 
     return (
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', p: 2 }}>
@@ -153,7 +118,29 @@ export default function EmployeeManagementPage() {
                     Quản lý nhân viên
                 </Typography>
 
-                <Stack direction="row" justifyContent="flex-end" mb={2}>
+                {/* Bộ lọc và nút thêm */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap" gap={2}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap="wrap">
+                        <TextField
+                            label="Tìm theo tên"
+                            size="small"
+                            value={searchText}
+                            onChange={handleSearchChange}
+                        />
+                        <TextField
+                            label="Trạng thái"
+                            size="small"
+                            select
+                            value={statusFilter}
+                            onChange={handleStatusChange}
+                            sx={{ minWidth: 150 }}
+                        >
+                            <MenuItem value="">Tất cả</MenuItem>
+                            <MenuItem value="Đang hoạt động">Đang hoạt động</MenuItem>
+                            <MenuItem value="Tạm nghỉ">Tạm nghỉ</MenuItem>
+                            <MenuItem value="Nghỉ việc">Nghỉ việc</MenuItem>
+                        </TextField>
+                    </Stack>
                     <Button
                         variant="contained"
                         color="primary"
@@ -163,29 +150,78 @@ export default function EmployeeManagementPage() {
                     >
                         Thêm nhân viên
                     </Button>
-                </Stack>
+                </Box>
 
                 <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-                    <DataGrid
-                        autoHeight
-                        rows={employees}
-                        columns={columns}
-                        components={{ Toolbar: GridToolbar }}
-                        pageSizeOptions={[5, 10, 20]}
-                        initialState={{
-                            pagination: { paginationModel: { pageSize: 5 } },
-                        }}
-                        sx={{
-                            '& .MuiDataGrid-columnHeaders': {
-                                backgroundColor: '#e3f2fd',
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiDataGrid-toolbarContainer': {
-                                justifyContent: 'flex-end',
-                            },
-                            borderRadius: 2,
-                        }}
-                    />
+                    {loading ? (
+                        <Stack alignItems="center" py={4}>
+                            <CircularProgress />
+                        </Stack>
+                    ) : (
+                        <>
+                            <TableContainer>
+                                <Table>
+                                    <TableHead sx={{ backgroundColor: '#e3f2fd' }}>
+                                        <TableRow>
+                                            <TableCell>Họ và tên</TableCell>
+                                            <TableCell>Email</TableCell>
+                                            <TableCell>SĐT</TableCell>
+                                            <TableCell>Chức vụ</TableCell>
+                                            <TableCell>Trạng thái</TableCell>
+                                            <TableCell>Ngày bắt đầu</TableCell>
+                                            <TableCell align="center">Lệnh</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {paginatedEmployees.map((row) => (
+                                            <TableRow key={row.id}>
+                                                <TableCell>{row.fullName}</TableCell>
+                                                <TableCell>{row.email}</TableCell>
+                                                <TableCell>{row.phone}</TableCell>
+                                                <TableCell>{row.position}</TableCell>
+                                                <TableCell>{renderStatus(row.status)}</TableCell>
+                                                <TableCell>{row.startDate}</TableCell>
+                                                <TableCell align="center">
+                                                    <Suspense fallback={<span />}>
+                                                        <Stack direction="row" spacing={1} justifyContent="center">
+                                                            <Button
+                                                                variant="outlined"
+                                                                color="primary"
+                                                                size="small"
+                                                                startIcon={<Visibility />}
+                                                                onClick={() => handleDetail(row)}
+                                                            >
+                                                                Chi tiết
+                                                            </Button>
+                                                            <Button
+                                                                variant="outlined"
+                                                                color="error"
+                                                                size="small"
+                                                                startIcon={<Delete />}
+                                                                onClick={() => handleDelete(row)}
+                                                            >
+                                                                Xóa
+                                                            </Button>
+                                                        </Stack>
+                                                    </Suspense>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+
+                            {/* Phân trang */}
+                            <Box mt={2} display="flex" justifyContent="center">
+                                <Pagination
+                                    count={Math.ceil(filteredEmployees.length / pageSize)}
+                                    page={page}
+                                    onChange={(e, value) => setPage(value)}
+                                    color="primary"
+                                />
+                            </Box>
+                        </>
+                    )}
                 </Paper>
             </Box>
         </Box>

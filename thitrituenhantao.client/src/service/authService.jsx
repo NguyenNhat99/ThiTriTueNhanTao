@@ -52,6 +52,20 @@ const updatePassword = async (MatKhau, MatKhauMoi) => {
 const updateInformation = async (updateData) => {
     try {
         const res = await api.post("/accounts/auth/changeinformation", updateData);
+        console.log("aaa" + res)
+        return res.status === 200;
+    } catch (err) {
+        console.error("Cập nhật thông tin thất bại:", err);
+        return false;
+    }
+}
+const updateEmployeeInformation = async (updateData) => {
+    try {
+        const res = await api.post("/accounts/auth/ChangeEmployeeInformation", updateData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return res.status === 200;
     } catch (err) {
         console.error("Cập nhật thông tin thất bại:", err);
@@ -103,5 +117,6 @@ export default {
     updatePassword,
     updateInformation,
     getAccounts,
-    getAccountDetail
+    getAccountDetail,
+    updateEmployeeInformation
 };

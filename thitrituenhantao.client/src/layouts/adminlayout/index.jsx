@@ -1,36 +1,24 @@
-﻿import * as React from 'react';
-
+﻿import React, { Suspense, lazy } from 'react';
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import AppNavbar from '../../components/dashboard/components/AppNavbar';
-
-import Header from '../../components/dashboard/components/Header';
-import SideMenu from '../../components/dashboard/components/SideMenu';
 import AppTheme from '../../theme/sharedtheme/AppTheme';
-import {
-    chartsCustomizations,
-    dataGridCustomizations,
-    datePickersCustomizations,
-    treeViewCustomizations,
-} from '../../components/dashboard/theme/customizations';
 
-const xThemeComponents = {
-    ...chartsCustomizations,
-    ...dataGridCustomizations,
-    ...datePickersCustomizations,
-    ...treeViewCustomizations,
-};
+// Lazy load các component
+const AppNavbar = lazy(() => import('../../components/dashboard/components/AppNavbar'));
+const SideMenu = lazy(() => import('../../components/dashboard/components/SideMenu'));
+const Header = lazy(() => import('../../components/dashboard/components/Header'));
 
 export default function Dashboard({ children, props }) {
     return (
-        <AppTheme {...props} themeComponents={xThemeComponents}>
+        <AppTheme {...props}>
             <CssBaseline enableColorScheme />
             <Box sx={{ display: 'flex' }}>
                 <SideMenu />
-                <AppNavbar />
-                {/* Main content */}
+                <Suspense fallback={null}>
+                    <AppNavbar />
+                </Suspense>
                 <Box
                     component="main"
                     sx={(theme) => ({
@@ -52,7 +40,6 @@ export default function Dashboard({ children, props }) {
                     >
                         <Header />
                         {children}
-                        {/*<MainGrid />*/}
                     </Stack>
                 </Box>
             </Box>

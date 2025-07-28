@@ -56,6 +56,7 @@ namespace ThiTriTueNhanTao.Server.Model
     }
     public class UpdateInformationModel
     {
+        public string Email { set; get; } = string.Empty;
         public string SoDt { set; get; } = string.Empty;
         public string HoTen { set; get; } = string.Empty;
         public bool GioiTinh { set; get; }

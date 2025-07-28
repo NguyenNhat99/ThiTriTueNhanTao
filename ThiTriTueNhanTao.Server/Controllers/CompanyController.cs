@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThiTriTueNhanTao.Server.Data;
 using ThiTriTueNhanTao.Server.Model.DTO;
@@ -20,6 +21,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Cấu trúc công ty
         [HttpGet("structure")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> GetStructure()
         {
             var result = await _repo.GetCompanyStructureAsync();
@@ -28,20 +30,22 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Thêm chi nhánh
         [HttpPost("chinhanh")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> CreateChiNhanh([FromBody] ChiNhanhCreateDTO dto)
         {
             var entity = new ChiNhanh { TenChiNhanh = dto.TenChiNhanh, SoNha = dto.SoNha, Xa = dto.Xa, 
                 Huyen = dto.Huyen, Tinh = dto.Huyen };
-            _context.ChiNhanh.Add(entity);
+            _context.ChiNhanhs.Add(entity);
             await _context.SaveChangesAsync();
             return Ok(entity);
         }
 
         // Sửa chi nhánh
         [HttpPut("chinhanh/{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> UpdateChiNhanh(int id, [FromBody] ChiNhanhUpdateDTO dto)
         {
-            var cn = await _context.ChiNhanh.FindAsync(id);
+            var cn = await _context.ChiNhanhs.FindAsync(id);
             if (cn == null) return NotFound("Chi nhánh không tồn tại");
 
             cn.TenChiNhanh = dto.TenChiNhanh;
@@ -56,9 +60,10 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Xóa chi nhánh
         [HttpDelete("chinhanh/{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> DeleteChiNhanh(int id)
         {
-            var chiNhanh = await _context.ChiNhanh
+            var chiNhanh = await _context.ChiNhanhs
                 .Include(cn => cn.PhongBans)
                 .FirstOrDefaultAsync(cn => cn.Id == id);
 
@@ -68,7 +73,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
             if (chiNhanh.PhongBans != null && chiNhanh.PhongBans.Any())
                 return BadRequest("Không thể xóa chi nhánh vì đang có phòng ban.");
 
-            _context.ChiNhanh.Remove(chiNhanh);
+            _context.ChiNhanhs.Remove(chiNhanh);
             await _context.SaveChangesAsync();
 
             return Ok("Xóa chi nhánh thành công.");
@@ -77,19 +82,21 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Thêm phòng ban
         [HttpPost("phongban")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> CreatePhongBan([FromBody] PhongBanCreateDTO dto)
         {
             var entity = new PhongBan { TenPhongBan = dto.TenPhongBan, ChiNhanhId = dto.ChiNhanhId, MoTa = dto.MoTa };
-            _context.PhongBan.Add(entity);
+            _context.phongBans.Add(entity);
             await _context.SaveChangesAsync();
             return Ok(entity);
         }
 
         // Sửa phòng ban
         [HttpPut("phongban/{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> UpdatePhongBan(int id, [FromBody] PhongBanUpdateDTO dto)
         {
-            var pb = await _context.PhongBan.FindAsync(id);
+            var pb = await _context.phongBans.FindAsync(id);
             if (pb == null) return NotFound("Phòng ban không tồn tại");
 
             pb.TenPhongBan = dto.TenPhongBan;
@@ -102,9 +109,10 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Xóa phòng ban
         [HttpDelete("phongban/{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> DeletePhongBan(int id)
         {
-            var phongBan = await _context.PhongBan
+            var phongBan = await _context.phongBans
                 .Include(pb => pb.Nhoms)
                 .FirstOrDefaultAsync(pb => pb.Id == id);
 
@@ -114,7 +122,7 @@ namespace ThiTriTueNhanTao.Server.Controllers
             if (phongBan.Nhoms != null && phongBan.Nhoms.Any())
                 return BadRequest("Không thể xóa phòng ban vì đang có nhóm.");
 
-            _context.PhongBan.Remove(phongBan);
+            _context.phongBans.Remove(phongBan);
             await _context.SaveChangesAsync();
 
             return Ok("Xóa phòng ban thành công.");
@@ -122,19 +130,21 @@ namespace ThiTriTueNhanTao.Server.Controllers
 
         // Thêm nhóm
         [HttpPost("nhom")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> CreateNhom([FromBody] NhomCreateDTO dto)
         {
             var entity = new Nhom { TenNhom = dto.TenNhom, PhongBanId = dto.PhongBanId, MoTaNhiemVu = dto.MoTaNhiemVu };
-            _context.Nhom.Add(entity);
+            _context.nhoms.Add(entity);
             await _context.SaveChangesAsync();
             return Ok(entity);
         }
 
         // Sửa nhóm
         [HttpPut("nhom/{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> UpdateNhom(int id, [FromBody] NhomUpdateDTO dto)
         {
-            var nh = await _context.Nhom.FindAsync(id);
+            var nh = await _context.nhoms.FindAsync(id);
             if (nh == null) return NotFound("Nhóm không tồn tại");
 
             nh.TenNhom = dto.TenNhom;

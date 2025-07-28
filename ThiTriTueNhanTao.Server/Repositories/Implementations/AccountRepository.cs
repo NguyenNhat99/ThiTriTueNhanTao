@@ -175,6 +175,47 @@ namespace ThiTriTueNhanTao.Server.Repositories.Implementations
             return result;
         }
 
+  
+        public async Task<bool> UpdateEmployeeAsync(UpdateInformationModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user == null) return false;
+
+            user.HoTen = model.HoTen;
+            user.CCCD = model.CCCD;
+            user.PhoneNumber = model.SoDt;
+            user.GioiTinh = model.GioiTinh;
+            user.NgayCap = DateTime.SpecifyKind(model.NgayCap, DateTimeKind.Utc);
+            user.NoiCap = model.NoiCap;
+            user.SoNha = model.SoNha;
+            user.Xa = model.Xa;
+            user.Huyen = model.Huyen;
+            user.Tinh = model.Tinh;
+            user.HeSoLuong = model.HeSoLuong;
+            user.TrangThai = model.TrangThai;
+            user.TrinhDo = model.TrinhDo;
+            user.NgayBatDauLam = DateTime.SpecifyKind(model.NgayBatDauLam, DateTimeKind.Utc);
+
+            if (model.images != null && model.images.Count > 0)
+            {
+                var imgs = await _context.hinhAnhNhanViens.Where(d => d.UserId.Equals(user.Id)).ToListAsync();
+                _context.RemoveRange(imgs);
+                foreach (var image in model.images)
+                {
+                    string url = await _ImageHelper.AddAsync(image, "employeeimg");
+                    HinhAnhNhanVien img = new HinhAnhNhanVien()
+                    {
+                        ImageUrl = url,
+                        UserId = user.Id
+                    };
+                    _context.hinhAnhNhanViens.Add(img);
+                }
+                await _context.SaveChangesAsync();
+            }
+            await _context.SaveChangesAsync();
+            var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
 
         public async Task<bool> UpdateInformationAsync(UpdateInformationModel model)
         {

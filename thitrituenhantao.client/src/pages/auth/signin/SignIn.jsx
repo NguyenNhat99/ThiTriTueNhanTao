@@ -66,7 +66,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props) {
-    const { signIn, user } = useContext(AuthContext);
+    const { signIn } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
@@ -78,16 +78,20 @@ export default function SignIn(props) {
     const [open, setOpen] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true); // ✅ kiểm tra token
+
+    // ✅ Check localStorage token
+    useEffect(() => {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            navigate('/admin/dashboard', { replace: true });
+        } else {
+            setCheckingAuth(false); // cho phép hiển thị form
+        }
+    }, [navigate]);
 
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
-    useEffect(() => {
-        if (user) {
-            const redirectPath = user.role === 'QuanLy' || user.role === 'NhanVien' ? '/admin/dashboard' : '/';
-            navigate(redirectPath, { replace: true });
-        }
-    }, [user, navigate]);
 
     const validateInputs = () => {
         let isValid = true;
@@ -121,13 +125,35 @@ export default function SignIn(props) {
 
         try {
             await signIn({ email, password });
+            // ✅ Chuyển hướng ngay sau khi đăng nhập thành công
+            navigate('/admin/dashboard', { replace: true });
         } catch (err) {
-            const msg = err.response?.status === 401 ? 'Sai email hoặc mật khẩu!' : err.message || 'Đăng nhập thất bại';
+            const msg =
+                err.response?.status === 401
+                    ? 'Sai email hoặc mật khẩu!'
+                    : err.message || 'Đăng nhập thất bại';
             setError(msg);
         } finally {
             setIsLoading(false);
         }
     };
+
+
+    // ✅ Loading trong lúc kiểm tra JWT
+    if (checkingAuth) {
+        return (
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <AppTheme {...props}>
@@ -137,10 +163,15 @@ export default function SignIn(props) {
                 <Card variant="outlined">
                     <SitemarkIcon />
                     <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
-                        Sign in
+                        Đăng nhập
                     </Typography>
                     {error && <Alert severity="error">{error}</Alert>}
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        noValidate
+                        sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
+                    >
                         <FormControl>
                             <FormLabel htmlFor="email">Email</FormLabel>
                             <TextField
@@ -176,12 +207,21 @@ export default function SignIn(props) {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </FormControl>
-                        <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+                        <FormControlLabel
+                            control={<Checkbox value="remember" color="primary" />}
+                            label="Remember me"
+                        />
                         <ForgotPassword open={open} handleClose={handleClose} />
                         <Button type="submit" fullWidth variant="contained" disabled={isLoading}>
                             {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Đăng nhập'}
                         </Button>
-                        <Link component="button" type="button" onClick={handleClickOpen} variant="body2" sx={{ alignSelf: 'center' }}>
+                        <Link
+                            component="button"
+                            type="button"
+                            onClick={handleClickOpen}
+                            variant="body2"
+                            sx={{ alignSelf: 'center' }}
+                        >
                             Quên mật khẩu ?
                         </Link>
                     </Box>

@@ -12,8 +12,8 @@ using ThiTriTueNhanTao.Server.Data;
 namespace ThiTriTueNhanTao.Server.Migrations
 {
     [DbContext(typeof(EmployeeDbContext))]
-    [Migration("20250723034327_CapNhatBangPhongBan")]
-    partial class CapNhatBangPhongBan
+    [Migration("20250728133054_11")]
+    partial class _11
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,10 +244,10 @@ namespace ThiTriTueNhanTao.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChiNhanhId")
+                    b.Property<int>("ChiNhanhId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ChucVuId")
+                    b.Property<int>("ChucVuId")
                         .HasColumnType("integer");
 
                     b.Property<int>("LuongCoBan")
@@ -256,10 +256,10 @@ namespace ThiTriTueNhanTao.Server.Migrations
                     b.Property<DateTime>("NgayBatDau")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("NhomId")
+                    b.Property<int>("NhomId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PhongBanId")
+                    b.Property<int>("PhongBanId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserId")
@@ -316,7 +316,7 @@ namespace ThiTriTueNhanTao.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("PhongBanId")
+                    b.Property<int>("PhongBanId")
                         .HasColumnType("integer");
 
                     b.Property<string>("TenNhom")
@@ -339,7 +339,7 @@ namespace ThiTriTueNhanTao.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ChiNhanhId")
+                    b.Property<int>("ChiNhanhId")
                         .HasColumnType("integer");
 
                     b.Property<string>("MoTa")
@@ -546,19 +546,27 @@ namespace ThiTriTueNhanTao.Server.Migrations
                 {
                     b.HasOne("ThiTriTueNhanTao.Server.Data.ChiNhanh", "ChiNhanh")
                         .WithMany("ChucVuNguoiDungs")
-                        .HasForeignKey("ChiNhanhId");
+                        .HasForeignKey("ChiNhanhId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ThiTriTueNhanTao.Server.Data.ChucVu", "ChucVu")
                         .WithMany("ChucVuNguoiDungs")
-                        .HasForeignKey("ChucVuId");
+                        .HasForeignKey("ChucVuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ThiTriTueNhanTao.Server.Data.Nhom", "Nhom")
                         .WithMany("ChucVuNguoiDungs")
-                        .HasForeignKey("NhomId");
+                        .HasForeignKey("NhomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ThiTriTueNhanTao.Server.Data.PhongBan", "PhongBan")
                         .WithMany("ChucVuNguoiDungs")
-                        .HasForeignKey("PhongBanId");
+                        .HasForeignKey("PhongBanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ThiTriTueNhanTao.Server.Data.User", "User")
                         .WithMany("ChucVuNguoiDungs")
@@ -592,7 +600,9 @@ namespace ThiTriTueNhanTao.Server.Migrations
                 {
                     b.HasOne("ThiTriTueNhanTao.Server.Data.PhongBan", "PhongBan")
                         .WithMany("Nhoms")
-                        .HasForeignKey("PhongBanId");
+                        .HasForeignKey("PhongBanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("PhongBan");
                 });
@@ -601,7 +611,9 @@ namespace ThiTriTueNhanTao.Server.Migrations
                 {
                     b.HasOne("ThiTriTueNhanTao.Server.Data.ChiNhanh", "ChiNhanh")
                         .WithMany("PhongBans")
-                        .HasForeignKey("ChiNhanhId");
+                        .HasForeignKey("ChiNhanhId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ChiNhanh");
                 });
